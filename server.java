@@ -94,14 +94,6 @@ public class server {
 		splitPane.setLeftComponent(txtServer);
 		txtServer.setColumns(10);
 		
-		/*btnUpdate = new JButton("Update");
-		btnUpdate.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				update();
-			}
-		});
-		frame.getContentPane().add(btnUpdate, BorderLayout.SOUTH);*/
 		JSplitPane splitPaneBott = new JSplitPane();
 		frame.getContentPane().add(splitPaneBott, BorderLayout.SOUTH);
 		
@@ -123,26 +115,24 @@ public class server {
 	}
 	
 	private void update(){
-		//System.out.println(playerList.size());
 		char [][] test = mp.getMap();
+		Character[][] eto = new Character[test.length][test.length];
 		String cont="";
 		for(int i=0;i<test.length;i++){
 			for(int j=0;j<test[0].length;j++){
-				cont = cont.concat(" " + String.valueOf(test[i][j])+" ");
+				eto[i][j] = Character.valueOf(test[i][j]);
 			}
-			cont = cont.concat("\n");
 		}
-		cont = cont.concat("health: ");
 		for(int i=0;i<playerList.length;i++){
 			if(playerList[i]!=null){
 				try {
-					String str = cont;
+					playerList[i].out.writeObject(eto);
+					String str="";
 					if(mp.playerList[i].hp != 0){
-						str = cont.concat(""+mp.playerList[i].hp);
+						str = "health: "+mp.playerList[i].hp;
 					}else{
-						str = cont.concat(""+mp.playerList[i].hp+" is dead");
+						str = "health: "+mp.playerList[i].hp+" is dead";
 					}
-					//playerList[i].out.writeObject(mp.getMap());
 					playerList[i].out.writeObject(str);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -221,8 +211,6 @@ public class server {
 				ObjectInputStream in = new ObjectInputStream(client.getInputStream());
 				System.out.println("Ready to listen"); uiOut("Ready to listen");
 				
-				//EventQueue.invokeLater(new Runnable(){
-				//	public void run(){
 				System.out.println("Listening");
 				while(true){
 					try {
@@ -248,8 +236,6 @@ public class server {
 						}else if(line.compareToIgnoreCase("pew")==0){
 							mp.playerList[playerNum].attack();
 						}else{
-							//textArea.setText(textArea.getText()+line+"\n");
-							//textArea.setText(line);
 							System.out.println(line);
 							uiOut(line);
 						}
@@ -265,8 +251,6 @@ public class server {
 						System.out.println("Ayan");
 					}
 				}
-				//	}
-				//});
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

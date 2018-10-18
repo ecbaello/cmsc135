@@ -177,8 +177,16 @@ public class client {
 				while(true){
 					try {
 						Object liney = in.readObject();
-						String line = liney.toString();
-						line.trim();
+						Character[][] test = (Character[][]) liney;
+						String line="";
+						for(int i=0;i<test.length;i++){
+							for(int j=0;j<test[0].length;j++){
+								line = line.concat(" " + String.valueOf(test[i][j]) + " ");
+							}
+							line = line.concat("\n");
+						}
+						String hp = (String) in.readObject();
+						line = line.concat(hp);
 						textArea.setText(line);
 					} catch (IOException e) {
 						System.out.println("Server died");
