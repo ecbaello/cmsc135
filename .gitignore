@@ -12,3 +12,7 @@
 /server$looper.class
 /server$player.class
 /server.class
+/test.class
+/ServerWGraphics.class
+/Game.class
+/ServerWGraphics$looper.class
