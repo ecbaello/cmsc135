@@ -1,43 +1,36 @@
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.BoxLayout;
-import java.awt.FlowLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import java.awt.BorderLayout;
-import javax.swing.JTextField;
-import java.awt.Font;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
+import java.awt.EventQueue;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.awt.event.ActionEvent;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.Color;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class client {
 
-	private JFrame frmClient;
+	private JFrame frame;
 	private JTextField textField;
-	private JButton btnNewButton;
-	private JScrollPane scrollPane;
-	private JTextArea textArea;
+	private JButton btn;
+	private Game game;
+	public String name;
+    private List<PlayerMP> players = new ArrayList<PlayerMP>();
 	
 	private String host = "7NVd";
 	private int openS = 1234;
 	private ObjectOutputStream out;
+	private JTextField debugN;
+	private JTextField debugL;
 
 	/**
 	 * Launch the application.
@@ -47,7 +40,7 @@ public class client {
 			public void run() {
 				try {
 					client window = new client();
-					window.frmClient.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -59,20 +52,17 @@ public class client {
 	 * Create the application.
 	 */
 	public client() {
-		while(true){
-			String s = (String)JOptionPane.showInputDialog(
-			                    null,
-			                    "Enter host address",
-			                    "Customized Dialog",
-			                    JOptionPane.PLAIN_MESSAGE,
-			                    null,
-			                    null,
-			                    "");
-			System.out.println(s);
-			if(s!=null && s.compareTo("")!=0){
-				host=s;
-				break;
-			}
+		String s = (String)JOptionPane.showInputDialog(
+                null,
+                "Enter host address",
+                "Customized Dialog",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                "");
+		System.out.println(s);
+		if(s!=null && s.compareTo("")!=0){
+			host=s;
 		}
 		initialize();
 		createSocket();
@@ -82,15 +72,17 @@ public class client {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmClient = new JFrame();
-		frmClient.setResizable(false);
-		frmClient.setTitle("CLIENT");
-		frmClient.setBounds(300, 15, 800, 715);
-		frmClient.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmClient.getContentPane().setLayout(new BorderLayout(0, 0));
+		frame = new JFrame();
+		frame.setResizable(false);
+		frame.setTitle("Game");
+		//frame.setBounds(300, 100, 450, 300);
+		frame.setSize(800, 715);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new BorderLayout(0,0));
 		
 		JPanel panel = new JPanel();
-		frmClient.getContentPane().add(panel, BorderLayout.SOUTH);
+		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		textField = new JTextField();
 		textField.addKeyListener(new KeyAdapter() {
@@ -99,7 +91,7 @@ public class client {
 				if(arg.getKeyCode()==10){
 					String text = textField.getText();
 					text = text.trim();
-					if(!text.startsWith("/c ") && text.contains(" ")){
+					/*if(!text.startsWith("/c ") && text.contains(" ")){
 						text = text.replaceAll("[ \t\n\r]+", " ");
 						System.out.println(text);
 						String arr[] = text.split(" ");
@@ -113,41 +105,47 @@ public class client {
 								e.printStackTrace();
 							}
 						}
-					}else{
+					}else{*/
 						if(isCommand(text))
 							send();
 						else
 							System.out.println("Command Not Recognized");
-					}
+					//}
+					textField.setText("");
 				}
 			}
 		});
 		panel.add(textField);
 		textField.setColumns(30);
-		textField.requestFocusInWindow();
 		
-		btnNewButton = new JButton("Send");
-		btnNewButton.addMouseListener(new MouseAdapter() {
+		btn = new JButton("Send");
+		btn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				send();
+				if(isCommand(textField.getText()))
+					send();
+				else
+					System.out.println("Command Not Recognized");
+				textField.setText("");
 			}
 		});
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		panel.add(btnNewButton);
+		panel.add(btn);
 		
-		scrollPane = new JScrollPane();
-		frmClient.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		debugN = new JTextField();
+		panel.add(debugN);
+		debugN.setColumns(10);
 		
-		textArea = new JTextArea();
-		textArea.setBackground(Color.BLACK);
-		textArea.setForeground(Color.WHITE);
-		textArea.setFont(new Font("Monospaced", Font.BOLD, 9));
-		textArea.setEditable(false);
-		scrollPane.setViewportView(textArea);
+		debugL = new JTextField();
+		panel.add(debugL);
+		debugL.setColumns(10);
+		
+		game = new Game();
+		game.setMinimumSize(Game.DIMENSIONS);
+        game.setMaximumSize(Game.DIMENSIONS);
+        game.setPreferredSize(Game.DIMENSIONS);
+		frame.getContentPane().add(game, BorderLayout.CENTER);
+		
+		game.start(this);
 	}
 	
 	public void createSocket(){
@@ -177,17 +175,20 @@ public class client {
 				while(true){
 					try {
 						Object liney = in.readObject();
-						Character[][] test = (Character[][]) liney;
-						String line="";
-						for(int i=0;i<test.length;i++){
-							for(int j=0;j<test[0].length;j++){
-								line = line.concat(" " + String.valueOf(test[i][j]) + " ");
-							}
-							line = line.concat("\n");
+						String[] str = (String[]) liney;
+						debug(str[0], str[1], str[2]);
+						if(str[0].equals(name)) continue;
+						int index = game.level.getPlayerMPIndex(str[0]);
+						if(index == -1){
+							System.out.println("New Player!");
+							PlayerMP pp = new PlayerMP(game.level, Integer.parseInt(str[1]), Integer.parseInt(str[2]), str[0]);
+							players.add(pp);
+							game.level.addEntity(pp);
+							index = game.level.getPlayerMPIndex(str[0]);
 						}
-						String hp = (String) in.readObject();
-						line = line.concat(hp);
-						textArea.setText(line);
+						if(index != -1){
+							game.level.movePlayer(index,Integer.parseInt(str[1]),Integer.parseInt(str[2]),str[3].charAt(0),Integer.parseInt(str[4]));
+						}
 					} catch (IOException e) {
 						System.out.println("Server died");
 						System.exit(-1);
@@ -203,31 +204,29 @@ public class client {
 	}
 	
 	private void send(){
-		try {
-			System.out.println("in");
-			String text = textField.getText();
-			if(isCommand(text.toLowerCase())){
-				out.writeObject(text);
-				System.out.println("Sent");
-			}else{
-				System.out.println("Command not recognized");
-			}
-			textField.setText("");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		System.out.println("in");
+		String text = textField.getText();
+		if(isCommand(text.toLowerCase())){
+			game.player.com = text;
+			game.player.wasPressed = true;
+			//callToSend();
+		}else{
+			System.out.println("Command not recognized");
 		}
 	}
 	
-	private void send(String str){
+	public void callToSend(){
 		try {
-			if(isCommand(str.toLowerCase())){
-				out.writeObject(str);
-				System.out.println("Sent");
-			}else{
-				System.out.println("Command not recognized");
-			}
-			textField.setText("");
+			/**	0: username; 1: x; 2: y; 3: direction; 4: hp	**/
+			String[] str = new String[5];
+			str[0] = game.player.getUsername();
+			str[1] = String.valueOf(game.player.x);
+			str[2] = String.valueOf(game.player.y);
+			str[3] = String.valueOf(game.player.direction);
+			str[4] = String.valueOf(game.player.hp);
+			
+			out.writeObject(str);
+			System.out.println("Sent");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -242,5 +241,10 @@ public class client {
 			return true;
 		
 		return false;
+	}
+	
+	private void debug(String str1, String str2, String str3){
+		debugN.setText(str1);
+		debugL.setText(str2 + "; "+ str3);
 	}
 }

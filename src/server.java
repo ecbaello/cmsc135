@@ -1,23 +1,22 @@
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.net.InetAddress;
 
-import java.awt.BorderLayout;
-import javax.swing.JSplitPane;
 import javax.swing.JButton;
-import java.awt.Font;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class server {
 
@@ -26,11 +25,10 @@ public class server {
 	private JScrollPane scrollPane;
 	private JTextArea textArea;
 	
-	private player[] playerList = new player[10];
 	private int openS = 1234;
-	private map mp;
 	private JTextField contAdd;
 	private JTextField contName;
+	private ObjectOutputStream[] playerList = new ObjectOutputStream[10];
 
 	/**
 	 * Launch the application.
@@ -57,8 +55,6 @@ public class server {
 			InetAddress myaddress = InetAddress.getLocalHost();
 			contAdd.setText(" IP Address: "+myaddress.getHostAddress());
 			contName.setText(" Host Name: "+myaddress.getHostName());
-			//System.out.println("IP Address: "+myaddress.getHostAddress());
-			//System.out.println("Host Name: "+myaddress.getHostName());
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -72,7 +68,6 @@ public class server {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JSplitPane splitPane = new JSplitPane();
 		frame.getContentPane().add(splitPane, BorderLayout.NORTH);
@@ -114,34 +109,6 @@ public class server {
 		scrollPane.setViewportView(textArea);
 	}
 	
-	private void update(){
-		char [][] test = mp.getMap();
-		Character[][] eto = new Character[test.length][test.length];
-		String cont="";
-		for(int i=0;i<test.length;i++){
-			for(int j=0;j<test[0].length;j++){
-				eto[i][j] = Character.valueOf(test[i][j]);
-			}
-		}
-		for(int i=0;i<playerList.length;i++){
-			if(playerList[i]!=null){
-				try {
-					playerList[i].out.writeObject(eto);
-					String str="";
-					if(mp.playerList[i].hp != 0){
-						str = "health: "+mp.playerList[i].hp;
-					}else{
-						str = "health: "+mp.playerList[i].hp+" is dead";
-					}
-					playerList[i].out.writeObject(str);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	
 	private void createSocket(){
 		System.out.println("Start");
 		try {
@@ -158,7 +125,6 @@ public class server {
 			e.printStackTrace();
 		}
 		
-		mp = new map(50);
 		for(int i=0;i<playerList.length;i++){
 			playerList[i]=null;
 		}
@@ -192,7 +158,12 @@ public class server {
 			client = toAccept;
 			for(int i=0;i<playerList.length;i++){
 				if(playerList[i]==null){
-					playerList[i] = new player(client,i);
+					try {
+						playerList[i] = new ObjectOutputStream(client.getOutputStream());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					playerNum=i;
 					update();
 					System.out.println("Connected "+playerList.length);
@@ -214,35 +185,12 @@ public class server {
 				System.out.println("Listening");
 				while(true){
 					try {
-						if(mp.playerList[playerNum].hp <= 0){
-							mp.playerList[playerNum].sprite = '#';
-							System.out.println("Player "+playerNum+" is dead");
-							return;
-						}
 						Object liney = in.readObject();
-						String line = liney.toString();
 						System.out.println("May na-receive from player "+(playerNum+1));
 						uiOut("May na-receive from player "+(playerNum+1));
-						System.out.println(line+"\n");
-						line.trim();
-						if(line.compareToIgnoreCase("w")==0){
-							mp.playerList[playerNum].move();
-						}else if(line.compareToIgnoreCase("a")==0){
-							mp.playerList[playerNum].rotL();
-						}else if(line.compareToIgnoreCase("d")==0){
-							mp.playerList[playerNum].rotR();
-						}else if(line.compareToIgnoreCase("back")==0){
-							mp.playerList[playerNum].back();
-						}else if(line.compareToIgnoreCase("pew")==0){
-							mp.playerList[playerNum].attack();
-						}else{
-							System.out.println(line);
-							uiOut(line);
-						}
-						update();
+						update(liney);
 					} catch (IOException e) {
 						playerList[playerNum] = null;
-						mp.remPlayer(playerNum);
 						System.out.println("A client has disconnected");
 						uiOut("A client has Disconnected");
 						update();
@@ -258,24 +206,59 @@ public class server {
 		}
 	}
 	
+	private void update(){
+		//System.out.println(playerList.size());
+		//char [][] test = mp.getMap();
+		/*Character[][] eto = new Character[test.length][test.length];
+		for(int i=0;i<test.length;i++){
+			for(int j=0;j<test[0].length;j++){
+				eto[i][j] = Character.valueOf(test[i][j]);
+			}
+		}*/
+		/**	0: index; 1: xPos; 2: yPos; 3: dir; 4: hp		**/
+		//String[][] eto = new String[mp.getPlayerSize()][6];
+		/*int k=0;
+		for(int i=0;i<mp.getPlayerSize();i++){
+			while(playerList==null) k++;
+			eto[i] = mp.getPlayerData(k);
+			k++;
+		}*/
+		
+		/*for(int i=0;i<playerList.length;i++){
+			if(playerList[i]!=null){
+				try {
+					//playerList[i].out.writeObject(eto);
+					/*String str="";
+					if(mp.playerList[i].hp != 0){
+						str = "health: "+mp.playerList[i].hp;
+					}else{
+						str = "health: "+mp.playerList[i].hp+" is dead";
+					}
+					playerList[i].out.writeObject(str);*/
+				/*} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}*/
+	}
+
+	private void update(Object obj){
+		for(int i=0;i<playerList.length;i++){
+			if(playerList[i]!=null){
+				System.out.println(i);
+				uiOut(String.valueOf(i));
+				try {
+					playerList[i].writeObject(obj);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	private void uiOut(String str){
 		textArea.setText(textArea.getText()+"\n"+str);
-	}
-	
-	private class player{
-		protected Socket client;
-		protected ObjectOutputStream out;
-		
-		player(Socket arg, int num){
-			client = arg;
-			try {
-				out = new ObjectOutputStream(arg.getOutputStream());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			mp.newPlayer(num);
-		}
 	}
 
 }
