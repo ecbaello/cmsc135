@@ -3,9 +3,12 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,9 +29,10 @@ public class server {
 	private JTextArea textArea;
 	
 	private int openS = 1234;
+	private int openO = 4321;
 	private JTextField contAdd;
 	private JTextField contName;
-	private ObjectOutputStream[] playerList = new ObjectOutputStream[10];
+	private outputStream[] playerList = new outputStream[10];
 
 	/**
 	 * Launch the application.
@@ -112,10 +116,11 @@ public class server {
 	private void createSocket(){
 		System.out.println("Start");
 		try {
-			ServerSocket socket = new ServerSocket(openS);
+			ServerSocket socketStr = new ServerSocket(openS);
+			ServerSocket socketObj = new ServerSocket(openO);
 			System.out.println("Server open");
 			uiOut("Server open");
-			looper ll = new looper(socket);
+			looper ll = new looper(socketStr,socketObj);
 			ll.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -131,16 +136,20 @@ public class server {
 	}
 	
 	public class looper extends Thread{
-		ServerSocket socket;
-		looper(ServerSocket arg){
-			socket = arg;
+		ServerSocket socketS;
+		ServerSocket socketO;
+		
+		looper(ServerSocket str, ServerSocket obj){
+			socketS = str;
+			socketO = obj;
 		}
+		
 		public void run(){
 			System.out.println("Client Waiter OPEN");
 			uiOut("Client Waiter OPEN");
 			while(true){
 				try {
-					clientWaiter cc = new clientWaiter(socket.accept());
+					clientWaiter cc = new clientWaiter(socketS.accept(),socketO.accept());
 					cc.start();
 				} catch (IOException e) {
 					System.out.println("Accept failed");
@@ -151,15 +160,17 @@ public class server {
 	}
 	
 	private class clientWaiter extends Thread{
-		private Socket client;
+		private Socket clientS;
+		private Socket clientO;
 		private int playerNum;
 		
-		clientWaiter(Socket toAccept){
-			client = toAccept;
+		clientWaiter(Socket sStr, Socket sObj){
+			clientS = sStr;
+			clientO = sObj;
 			for(int i=0;i<playerList.length;i++){
 				if(playerList[i]==null){
 					try {
-						playerList[i] = new ObjectOutputStream(client.getOutputStream());
+						playerList[i] = new outputStream(new PrintWriter(clientS.getOutputStream(),true),new ObjectOutputStream(clientO.getOutputStream())); 
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -179,29 +190,70 @@ public class server {
 		
 		public void run(){
 			try {
-				ObjectInputStream in = new ObjectInputStream(client.getInputStream());
-				System.out.println("Ready to listen"); uiOut("Ready to listen");
-				
-				System.out.println("Listening");
-				while(true){
-					try {
-						Object liney = in.readObject();
-						System.out.println("May na-receive from player "+(playerNum+1));
-						uiOut("May na-receive from player "+(playerNum+1));
-						update(liney);
-					} catch (IOException e) {
-						playerList[playerNum] = null;
-						System.out.println("A client has disconnected");
-						uiOut("A client has Disconnected");
-						update();
-						break;
-					} catch (ClassNotFoundException e) {
-						System.out.println("Ayan");
-					}
-				}
+				waitForObj obj = new waitForObj(new ObjectInputStream(clientO.getInputStream()),playerNum);
+				obj.start();
+				waitForStr str = new waitForStr(new BufferedReader(new InputStreamReader(clientS.getInputStream())),playerNum);
+				str.start();
+				System.out.println("Listening"); uiOut("Listening");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+		}
+	}
+	
+	private class waitForObj extends Thread{
+		private ObjectInputStream in;
+		private int playerNum;
+		
+		public waitForObj(ObjectInputStream in, int playerNum){
+			this.in = in;
+			this.playerNum = playerNum;
+		}
+		
+		public void run(){
+			while(true){
+				try {
+					Object liney = in.readObject();
+					System.out.println("May na-receive from player "+(playerNum+1));
+					uiOut("May na-receive from player "+(playerNum+1));
+					update(liney);
+				} catch (IOException e) {
+					playerList[playerNum] = null;
+					System.out.println("A client has disconnected");
+					uiOut("A client has Disconnected");
+					update();
+					break;
+				} catch (ClassNotFoundException e) {
+					System.out.println("Ayan");
+				}
+			}
+		}
+	}
+	
+	private class waitForStr extends Thread{
+		private BufferedReader in;
+		private int playerNum;
+		
+		waitForStr(BufferedReader in, int playerNum){
+			this.in= in;
+			this.playerNum = playerNum;
+		}
+		
+		public void run(){
+			while(true){
+				try {
+					String line = in.readLine();
+					System.out.println("May na-receive from player "+(playerNum+1));
+					uiOut("May na-receive from player "+(playerNum+1));
+					update(line);
+				} catch (IOException e) {
+					playerList[playerNum] = null;
+					System.out.println("A client has disconnected");
+					uiOut("A client has Disconnected");
+					update();
+					break;
+				}
 			}
 		}
 	}
@@ -249,7 +301,7 @@ public class server {
 				System.out.println(i);
 				uiOut(String.valueOf(i));
 				try {
-					playerList[i].writeObject(obj);
+					playerList[i].getOOS().writeObject(obj);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -257,8 +309,37 @@ public class server {
 			}
 		}
 	}
+	
+	private void update(String str){
+		System.out.println(str);
+		for(int i=0;i<playerList.length;i++){
+			if(playerList[i]!=null){
+				System.out.println(i);
+				uiOut(String.valueOf(i));
+				playerList[i].getPW().println(str);
+			}
+		}
+	}
+	
 	private void uiOut(String str){
 		textArea.setText(textArea.getText()+"\n"+str);
 	}
 
+	private class outputStream{
+		private ObjectOutputStream obj;
+		private PrintWriter str;
+		
+		public outputStream(PrintWriter str, ObjectOutputStream obj){
+			this.str = str;
+			this.obj = obj;
+		}
+		
+		public ObjectOutputStream getOOS(){
+			return obj;
+		}
+		
+		public PrintWriter getPW(){
+			return str;
+		}
+	}
 }

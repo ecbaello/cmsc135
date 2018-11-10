@@ -4,9 +4,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class client {
@@ -28,9 +33,11 @@ public class client {
 	
 	private String host = "7NVd";
 	private int openS = 1234;
-	private ObjectOutputStream out;
-	private JTextField debugN;
-	private JTextField debugL;
+	private int openO = 4321;
+	private ObjectOutputStream obj;
+	private PrintWriter text;
+	private JScrollPane scrollPane;
+	private JTextArea chatBox;
 
 	/**
 	 * Launch the application.
@@ -76,7 +83,7 @@ public class client {
 		frame.setResizable(false);
 		frame.setTitle("Game");
 		//frame.setBounds(300, 100, 450, 300);
-		frame.setSize(800, 715);
+		frame.setSize(1100, 715);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0,0));
@@ -89,29 +96,7 @@ public class client {
 			@Override
 			public void keyReleased(KeyEvent arg) {
 				if(arg.getKeyCode()==10){
-					String text = textField.getText();
-					text = text.trim();
-					/*if(!text.startsWith("/c ") && text.contains(" ")){
-						text = text.replaceAll("[ \t\n\r]+", " ");
-						System.out.println(text);
-						String arr[] = text.split(" ");
-						for(int i=0;i<arr.length;i++){
-							if(isCommand(arr[i].toString()))
-								send(arr[i].toString());
-							try {
-								Thread.sleep(300);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}else{*/
-						if(isCommand(text))
-							send();
-						else
-							System.out.println("Command Not Recognized");
-					//}
-					textField.setText("");
+					signal();
 				}
 			}
 		});
@@ -122,28 +107,25 @@ public class client {
 		btn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				if(isCommand(textField.getText()))
-					send();
-				else
-					System.out.println("Command Not Recognized");
-				textField.setText("");
+				signal();
 			}
 		});
 		panel.add(btn);
-		
-		debugN = new JTextField();
-		panel.add(debugN);
-		debugN.setColumns(10);
-		
-		debugL = new JTextField();
-		panel.add(debugL);
-		debugL.setColumns(10);
 		
 		game = new Game();
 		game.setMinimumSize(Game.DIMENSIONS);
         game.setMaximumSize(Game.DIMENSIONS);
         game.setPreferredSize(Game.DIMENSIONS);
 		frame.getContentPane().add(game, BorderLayout.CENTER);
+		
+		scrollPane = new JScrollPane();
+		frame.getContentPane().add(scrollPane, BorderLayout.EAST);
+		
+		chatBox = new JTextArea();
+		chatBox.setEditable(false);
+		chatBox.setColumns(20);
+		scrollPane.setViewportView(chatBox);
+		chatBox.setText("Chat Box");
 		
 		game.start(this);
 	}
@@ -152,10 +134,12 @@ public class client {
 		System.out.println("Start");
 		
 		try {
-			Socket socket = new Socket(host,openS);
-			out = new ObjectOutputStream(socket.getOutputStream()); 
+			Socket socketS = new Socket(host,openS);
+			Socket socketO = new Socket(host,openO);
+			obj = new ObjectOutputStream(socketO.getOutputStream());
+			text = new PrintWriter(socketS.getOutputStream(),true);
 			
-			listener ll = new listener(socket);
+			listener ll = new listener(socketS,socketO);
 			ll.start();
 		} catch (IOException e) {
 			System.out.println("Can't find I/O");
@@ -165,37 +149,20 @@ public class client {
 	}
 	
 	public class listener extends Thread{
-		Socket socket;
-		listener(Socket arg){
-			socket = arg;
+		Socket socketS;
+		Socket socketO;
+		
+		listener(Socket str, Socket obj){
+			socketS = str;
+			socketO = obj;
 		}
+		
 		public void run(){
 			try {
-				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-				while(true){
-					try {
-						Object liney = in.readObject();
-						String[] str = (String[]) liney;
-						debug(str[0], str[1], str[2]);
-						if(str[0].equals(name)) continue;
-						int index = game.level.getPlayerMPIndex(str[0]);
-						if(index == -1){
-							System.out.println("New Player!");
-							PlayerMP pp = new PlayerMP(game.level, Integer.parseInt(str[1]), Integer.parseInt(str[2]), str[0]);
-							players.add(pp);
-							game.level.addEntity(pp);
-							index = game.level.getPlayerMPIndex(str[0]);
-						}
-						if(index != -1){
-							game.level.movePlayer(index,Integer.parseInt(str[1]),Integer.parseInt(str[2]),str[3].charAt(0),Integer.parseInt(str[4]));
-						}
-					} catch (IOException e) {
-						System.out.println("Server died");
-						System.exit(-1);
-					} catch (ClassNotFoundException e) {
-						System.out.println("Ayan");
-					}
-				}
+				waitForObj obj = new waitForObj(new ObjectInputStream(socketO.getInputStream()));
+				obj.start();
+				waitForStr str = new waitForStr(new BufferedReader(new InputStreamReader(socketS.getInputStream())));
+				str.start();
 			} catch (IOException e) {
 				System.out.println("Server died");
 				System.exit(-1);
@@ -203,15 +170,96 @@ public class client {
 		}
 	}
 	
-	private void send(){
-		System.out.println("in");
+	private class waitForObj extends Thread{
+		ObjectInputStream in;
+		
+		public waitForObj(ObjectInputStream in){
+			this.in = in;
+		}
+		
+		public void run(){
+			while(true){
+				try {
+					Object liney = in.readObject();
+					String[] str = (String[]) liney;
+					if(str[0].equals(name)) continue;
+					int index = game.level.getPlayerMPIndex(str[0]);
+					if(index == -1){
+						System.out.println("New Player!");
+						PlayerMP pp = new PlayerMP(game.level, Integer.parseInt(str[1]), Integer.parseInt(str[2]), str[0]);
+						players.add(pp);
+						game.level.addEntity(pp);
+						index = game.level.getPlayerMPIndex(str[0]);
+					}
+					if(index != -1){
+						game.level.movePlayer(index,Integer.parseInt(str[1]),Integer.parseInt(str[2]),str[3].charAt(0),Integer.parseInt(str[4]));
+					}
+				} catch (IOException e) {
+					System.out.println("Server died");
+					System.exit(-1);
+				} catch (ClassNotFoundException e) {
+					System.out.println("Ayan");
+				}
+			}
+		}
+	}
+	
+	private class waitForStr extends Thread{
+		private BufferedReader in;
+		
+		public waitForStr(BufferedReader in){
+			this.in = in;
+		}
+		
+		public void run(){
+			while(true){
+				try {
+					String line = in.readLine();
+					chatBox.append("\n"+line);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private void signal(){
 		String text = textField.getText();
-		if(isCommand(text.toLowerCase())){
-			game.player.com = text;
-			game.player.wasPressed = true;
-			//callToSend();
+		text = text.trim();
+		/*if(!text.startsWith("/c ") && text.contains(" ")){
+			text = text.replaceAll("[ \t\n\r]+", " ");
+			System.out.println(text);
+			String arr[] = text.split(" ");
+			for(int i=0;i<arr.length;i++){
+				if(isCommand(arr[i].toString()))
+					send(arr[i].toString());
+				try {
+					Thread.sleep(300);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}else{*/
+			if(isCommand(text))
+				send(text);
+			else
+				System.out.println("Command Not Recognized");
+		//}
+		textField.setText("");
+	}
+	
+	private void send(String txt){
+		if(txt.startsWith("/c")){
+			String mess = txt.replaceFirst("/c ", "");
+			mess = "<"+name+">:  "+mess;
+			//chatBox.append(mess);
+			text.println(mess);
+			System.out.println("sent");
 		}else{
-			System.out.println("Command not recognized");
+			game.player.com = txt;
+			game.player.wasPressed = true;
 		}
 	}
 	
@@ -225,7 +273,7 @@ public class client {
 			str[3] = String.valueOf(game.player.direction);
 			str[4] = String.valueOf(game.player.hp);
 			
-			out.writeObject(str);
+			obj.writeObject(str);
 			System.out.println("Sent");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -241,10 +289,5 @@ public class client {
 			return true;
 		
 		return false;
-	}
-	
-	private void debug(String str1, String str2, String str3){
-		debugN.setText(str1);
-		debugL.setText(str2 + "; "+ str3);
 	}
 }
