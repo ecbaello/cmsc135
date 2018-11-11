@@ -27,7 +27,7 @@ import javax.swing.JLabel;
 public class client {
 
 	private JFrame frame;
-	private JTextField textField;
+	public static JTextField textField;
 	private JButton btn;
 	private Game game;
 	public String name;
@@ -135,6 +135,7 @@ public class client {
 		panel.add(lblCommand);
 		panel.add(textField);
 		textField.setColumns(30);
+		
 		
 		btn = new JButton("Send");
 		btn.setFont(new Font("Tahoma", Font.BOLD, 16));

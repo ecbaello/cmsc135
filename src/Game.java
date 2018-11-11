@@ -49,12 +49,13 @@ public class Game extends Canvas implements Runnable {
                 }
             }
         }
+        Random generator = new Random(); 
+        int i = generator.nextInt(WIDTH*2);
+        int j = generator.nextInt(WIDTH*2);
         screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("sprite_sheet.png"));
         level = new Level("water_test_level.png");
-        Random rand = new Random();
-        int tX = 8;//*rand.nextInt(50);
-        int tY = 8;//*rand.nextInt(50);
-        player = new PlayerMP(level, tX, tY, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
+        player = new PlayerMP(level, i, j, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
+        client.textField.requestFocus();
         player.game = this;
         level.addEntity(player);
 		cc.name = player.getUsername();
