@@ -157,12 +157,13 @@ public class Level {
         return index;
     }
 
-    public synchronized void movePlayer(int index, int x, int y, char dir, int hp) {
+    public synchronized void movePlayer(int index, int x, int y, char dir, int hp, int weapon) {
     	/**	0: username; 1: x; 2: y; 3: direction; 4: hp	**/
         PlayerMP player = (PlayerMP) this.getEntities().get(index);
         player.x = x;
         player.y = y;
         player.direction = dir;
         player.hp = hp;
+        player.weapon = weapon;
     }
 }
