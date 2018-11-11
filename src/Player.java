@@ -2,7 +2,7 @@ import java.util.List;
 
 public class Player extends Mob {
 
-    private int colour = Colours.get(-1, 111, 005, 441);
+    private int colour = Colours.get(-1, 500, 555, 443);
     private int scale = 1;
     protected boolean isSwimming = false;
     protected boolean isBurning = false;
@@ -82,7 +82,7 @@ public class Player extends Mob {
         int yTile = 28;
         int walkingSpeed = 0;
         int flipTop = (numSteps >> walkingSpeed) & 1;
-        int flipBottom = (numSteps >> walkingSpeed) & 1;
+        int flipBottom = (numSteps >> walkingSpeed) + 1 & 1;
         
         if (movingDir == 1) {
             xTile += 2;
@@ -112,28 +112,34 @@ public class Player extends Mob {
 	            screen.render(xOffset, yOffset + 3, 0 + 27 * 32, waterColour, 0x00, 1);
 	            screen.render(xOffset + 8, yOffset + 3, 0 + 27 * 32, waterColour, 0x01, 1);
 	        }
-	        if(!isBurning) {
-	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, colour, flipTop, scale);
-	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, colour, flipTop,
-	                scale);
-	        }else {
-	        	hp -= 1;
-	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, Colours.get(-1, 000, 003, 330), flipTop, scale);
-	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, Colours.get(-1, 000, 003, 330), flipTop,
-	                scale);
+	        if (!isSwimming) {
+	            screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, colour,flipBottom, scale);
+	            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1) * 32, colour, flipBottom, scale);
 	        }
 	        
-	        if (!isSwimming) {
-	            screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, colour,
+	        if(!isBurning) {
+	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, colour, flipTop, scale);
+	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, colour, flipTop, scale);
+	        }else {
+	        	hp -= 1;
+	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, Colours.get(-1, 400, 444, 332), flipTop, scale);
+	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, Colours.get(-1, 400, 444, 332), flipTop,
+	                scale);
+	        	screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, Colours.get(-1, 400, 444, 332),
 	                    flipBottom, scale);
 	            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1)
-	                    * 32, colour, flipBottom, scale);
+	                    * 32, Colours.get(-1, 400, 444, 332), flipBottom, scale);
 	        }
+	        
     	}else {
     		screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, Colours.get(-1, 000, 000, 000), flipTop, scale);
         	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, Colours.get(-1, 000, 000, 000), flipTop,
                 scale);
-    	}
+        	screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, Colours.get(-1, 000, 000, 000),
+                    flipBottom, scale);
+            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1)
+                    * 32, Colours.get(-1, 000, 000, 000), flipBottom, scale);
+        }
         if (username != null) {
         	String disp = username+" "+String.valueOf(hp/100);
             Font.render(disp, screen, xOffset - ((disp.length() - 1) / 2 * 8), yOffset - 10,
