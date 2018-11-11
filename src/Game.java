@@ -4,9 +4,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.File;
+import java.util.Random;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class Game extends Canvas implements Runnable {
@@ -50,9 +49,13 @@ public class Game extends Canvas implements Runnable {
                 }
             }
         }
+        Random generator = new Random(); 
+        int i = generator.nextInt(WIDTH*2);
+        int j = generator.nextInt(WIDTH*2);
         screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("sprite_sheet.png"));
         level = new Level("water_test_level.png");
-        player = new PlayerMP(level, 8, 8, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
+        player = new PlayerMP(level, i, j, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
+        client.textField.requestFocus();
         player.game = this;
         level.addEntity(player);
 		cc.name = player.getUsername();

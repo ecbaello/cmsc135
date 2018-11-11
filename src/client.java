@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 public class client {
 
 	private JFrame frame;
-	private JTextField textField;
+	public static JTextField textField;
 	private JButton btn;
 	private Game game;
 	public String name;
@@ -102,6 +102,7 @@ public class client {
 		});
 		panel.add(textField);
 		textField.setColumns(30);
+		
 		
 		btn = new JButton("Send");
 		btn.addMouseListener(new MouseAdapter() {
