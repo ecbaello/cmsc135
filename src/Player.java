@@ -80,7 +80,7 @@ public class Player extends Mob {
     public void render(Screen screen) {
         int xTile = 0;
         int yTile = 28;
-        int walkingSpeed = 4;
+        int walkingSpeed = 0;
         int flipTop = (numSteps >> walkingSpeed) & 1;
         int flipBottom = (numSteps >> walkingSpeed) & 1;
         
