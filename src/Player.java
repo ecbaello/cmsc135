@@ -2,7 +2,7 @@ import java.util.List;
 
 public class Player extends Mob {
 
-    private int colour = Colours.get(-1, 111, 005, 441);
+    private int colour = Colours.get(-1, 500, 555, 443);
     private int scale = 1;
     protected boolean isSwimming = false;
     protected boolean isBurning = false;
@@ -80,9 +80,9 @@ public class Player extends Mob {
     public void render(Screen screen) {
         int xTile = 0;
         int yTile = 28;
-        int walkingSpeed = 4;
+        int walkingSpeed = 0;
         int flipTop = (numSteps >> walkingSpeed) & 1;
-        int flipBottom = (numSteps >> walkingSpeed) & 1;
+        int flipBottom = (numSteps >> walkingSpeed) + 1 & 1;
         
         if (movingDir == 1) {
             xTile += 2;
@@ -112,29 +112,34 @@ public class Player extends Mob {
 	            screen.render(xOffset, yOffset + 3, 0 + 27 * 32, waterColour, 0x00, 1);
 	            screen.render(xOffset + 8, yOffset + 3, 0 + 27 * 32, waterColour, 0x01, 1);
 	        }
-	        if(!isBurning) {
-	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, colour, flipTop, scale);
-	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, colour, flipTop,
-	                scale);
-	        }else {
-	        	hp -= 1;
-	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, Colours.get(-1, 000, 003, 330), flipTop, scale);
-	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, Colours.get(-1, 000, 003, 330), flipTop,
-	                scale);
-	        	printHP();
+	        if (!isSwimming) {
+	            screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, colour,flipBottom, scale);
+	            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1) * 32, colour, flipBottom, scale);
 	        }
 	        
-	        if (!isSwimming) {
-	            screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, colour,
+	        if(!isBurning) {
+	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, colour, flipTop, scale);
+	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, colour, flipTop, scale);
+	        }else {
+	        	hp -= 1;
+	        	screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, Colours.get(-1, 400, 444, 332), flipTop, scale);
+	        	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, Colours.get(-1, 400, 444, 332), flipTop,
+	                scale);
+	        	screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, Colours.get(-1, 400, 444, 332),
 	                    flipBottom, scale);
 	            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1)
-	                    * 32, colour, flipBottom, scale);
+	                    * 32, Colours.get(-1, 400, 444, 332), flipBottom, scale);
 	        }
+	        
     	}else {
     		screen.render(xOffset + (modifier * flipTop), yOffset, xTile + yTile * 32, Colours.get(-1, 000, 000, 000), flipTop, scale);
         	screen.render(xOffset + modifier - (modifier * flipTop), yOffset, (xTile + 1) + yTile * 32, Colours.get(-1, 000, 000, 000), flipTop,
                 scale);
-    	}
+        	screen.render(xOffset + (modifier * flipBottom), yOffset + modifier, xTile + (yTile + 1) * 32, Colours.get(-1, 000, 000, 000),
+                    flipBottom, scale);
+            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1)
+                    * 32, Colours.get(-1, 000, 000, 000), flipBottom, scale);
+        }
         if (username != null) {
         	String disp = username+" "+String.valueOf(hp/100);
             Font.render(disp, screen, xOffset - ((disp.length() - 1) / 2 * 8), yOffset - 10,
@@ -239,9 +244,7 @@ public class Player extends Mob {
     	
     	for(Entity e:ent){
     		switch(weapon){
-    			case 1: checkPistolRange(e); break;
-    			case 2:	checkShotgunRange(e); break;
-    			case 3:	checkSniperRange(e); break;
+    			case 1: checkPistolRange(e);
     		}
     	}
     }
@@ -260,7 +263,7 @@ public class Player extends Mob {
     }
     
     public void printHP(){
-    	game.cc.hpField.setText(String.valueOf(hp/100));
+    	game.cc.hpField.setText(String.valueOf(hp));
     }
     
     /** For Checking **/
@@ -268,22 +271,22 @@ public class Player extends Mob {
     private void checkPistolRange(Entity ent){
     	switch(direction){
     		case 'w':
-    			if( x==ent.x && ( (y-8)==ent.y || (y-16)==ent.y ) ){
+    			if( ((y-8)>=0 && (y-8)==ent.y) || ((y-16)>=0 && (y-16)==ent.y) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
     		case 'a':
-    			if( y==ent.y && ( (x-8)==ent.x || (x-16)==ent.x ) ){
+    			if( ((x-8)>=0 && (x-8)==ent.x) || ((x-16)>=0 && (x-16)==ent.x) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
     		case 's':
-    			if( x==ent.x && ( (y+8)==ent.y || (y+16)==ent.y ) ){
+    			if( ((y+8)<=400 && (y+8)==ent.y) || ((y+16)<=400 && (y+16)==ent.y) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
     		case 'd':
-    			if( y==ent.y && ( (x+8)==ent.x || (x+16)==ent.x ) ){
+    			if( ((x+8)<=400 && (x+8)==ent.x) || ((x+16)<=400 && (x+16)==ent.x) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
@@ -292,58 +295,16 @@ public class Player extends Mob {
     }
     
     private void checkShotgunRange(Entity ent){
-    	switch(direction){
-	    	case 'w':
-				if( ( ( (y-16)==ent.y || (y-24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
-					game.cc.callDmg(ent.username + "-_-" + "2");
-				}
-				break;
-			case 'a':
-				if( ( ( (x-16)==ent.x || (x-24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
-					game.cc.callDmg(ent.username + "-_-" + "2");
-				}
-				break;
-			case 's':
-				if( ( ( (y+16)==ent.y || (y+24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
-					game.cc.callDmg(ent.username + "-_-" + "2");
-				}
-				break;
-			case 'd':
-				if( ( ( (x+16)==ent.x || (x+24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
-					game.cc.callDmg(ent.username + "-_-" + "2");
-				}
-				break;
-			default:	System.out.println("Bakit may ganyan");
-    	}
+    	
     }
     
     private void checkSniperRange(Entity ent){
     	switch(direction){
-			case 'w':
-				if(x!=ent.x) return;
-				if( (y-32)==ent.y || (y-40)==ent.y || (y-48)==ent.y ){
-					game.cc.callDmg(ent.username + "-_-" + "3");
-				}
-				break;
-			case 'a':
-				if(y!=ent.y) return;
-				if( (x-32)==ent.x || (x-40)==ent.x || (x-48)==ent.x ){
-					game.cc.callDmg(ent.username + "-_-" + "3");
-				}
-				break;
-			case 's':
-				if(x!=ent.x) return;
-				if( (y+32)==ent.y || (y+40)==ent.y || (y+48)==ent.y ){
-					game.cc.callDmg(ent.username + "-_-" + "3");
-				}
-				break;
-			case 'd':
-				if(y!=ent.y) return;
-				if( (x+32)==ent.x || (x+48)==ent.x || (x+48)==ent.x ){
-					game.cc.callDmg(ent.username + "-_-" + "3");
-				}
-				break;
-			default:	System.out.println("Bakit may ganyan");
+    		case 'w':
+    			
+    		case 'a':	
+    		case 's':	
+    		case 'd':	
     	}
     }
     
