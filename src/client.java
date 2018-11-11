@@ -45,7 +45,7 @@ public class client {
 	private JLabel lblCommand;
 	public JTextField gunField;
 	private JLabel lblGun;
-	private int[] damage = {5, 10, 20};
+	private int[] damage = {500, 1000, 2000};
 
 	/**
 	 * Launch the application.
