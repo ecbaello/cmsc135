@@ -244,7 +244,9 @@ public class Player extends Mob {
     	
     	for(Entity e:ent){
     		switch(weapon){
-    			case 1: checkPistolRange(e);
+    			case 1: checkPistolRange(e); break;
+    			case 2: checkShotgunRange(e); break;
+    			case 3: checkSniperRange(e); break;
     		}
     	}
     }
@@ -263,7 +265,7 @@ public class Player extends Mob {
     }
     
     public void printHP(){
-    	game.cc.hpField.setText(String.valueOf(hp));
+    	game.cc.hpField.setText(String.valueOf(hp/100));
     }
     
     /** For Checking **/
