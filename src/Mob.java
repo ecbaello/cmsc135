@@ -8,7 +8,7 @@ public abstract class Mob extends Entity {
     protected int scale = 1;
 
     public Mob(Level level, String name, int x, int y, int speed) {
-        super(level);
+        super(level, name);
         this.name = name;
         this.x = x;
         this.y = y;

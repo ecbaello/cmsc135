@@ -4,9 +4,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.File;
+import java.util.Random;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class Game extends Canvas implements Runnable {
@@ -52,10 +51,15 @@ public class Game extends Canvas implements Runnable {
         }
         screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("sprite_sheet.png"));
         level = new Level("water_test_level.png");
-        player = new PlayerMP(level, 8, 8, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
+        Random rand = new Random();
+        int tX = 8;//*rand.nextInt(50);
+        int tY = 8;//*rand.nextInt(50);
+        player = new PlayerMP(level, tX, tY, JOptionPane.showInputDialog(this, "Please enter a username"), null, -1);
         player.game = this;
         level.addEntity(player);
 		cc.name = player.getUsername();
+		player.printHP();
+		player.printWeapon();
         /*if (!isApplet) {
             Packet00Login loginPacket = new Packet00Login(player.getUsername(), player.x, player.y);
             if (socketServer != null) {

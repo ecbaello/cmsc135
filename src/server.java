@@ -114,7 +114,7 @@ public class server {
 	}
 	
 	private void createSocket(){
-		System.out.println("Start");
+		System.out.println("Start"); uiOut("Start");
 		try {
 			ServerSocket socketStr = new ServerSocket(openS);
 			ServerSocket socketObj = new ServerSocket(openO);

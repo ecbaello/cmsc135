@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import java.awt.Font;
+import javax.swing.JLabel;
 
 public class client {
 
@@ -38,6 +40,12 @@ public class client {
 	private PrintWriter text;
 	private JScrollPane scrollPane;
 	private JTextArea chatBox;
+	public JTextField hpField;
+	private JLabel lblHp;
+	private JLabel lblCommand;
+	public JTextField gunField;
+	private JLabel lblGun;
+	private int[] damage = {5, 10, 20};
 
 	/**
 	 * Launch the application.
@@ -92,6 +100,7 @@ public class client {
 		frame.getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		textField = new JTextField();
+		textField.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent arg) {
@@ -100,19 +109,51 @@ public class client {
 				}
 			}
 		});
+		
+		lblHp = new JLabel("HP:");
+		lblHp.setFont(new Font("Tahoma", Font.BOLD, 17));
+		panel.add(lblHp);
+		
+		hpField = new JTextField();
+		hpField.setEditable(false);
+		hpField.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		panel.add(hpField);
+		hpField.setColumns(5);
+		
+		lblGun = new JLabel("Gun:");
+		lblGun.setFont(new Font("Tahoma", Font.BOLD, 17));
+		panel.add(lblGun);
+		
+		gunField = new JTextField();
+		gunField.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		gunField.setEditable(false);
+		panel.add(gunField);
+		gunField.setColumns(10);
+		
+		lblCommand = new JLabel("Command:");
+		lblCommand.setFont(new Font("Tahoma", Font.BOLD, 14));
+		panel.add(lblCommand);
 		panel.add(textField);
 		textField.setColumns(30);
 		
 		btn = new JButton("Send");
+		btn.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btn.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				signal();
+				textField.requestFocus();
 			}
 		});
 		panel.add(btn);
 		
 		game = new Game();
+		game.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				textField.requestFocus();
+			}
+		});
 		game.setMinimumSize(Game.DIMENSIONS);
         game.setMaximumSize(Game.DIMENSIONS);
         game.setPreferredSize(Game.DIMENSIONS);
@@ -192,7 +233,7 @@ public class client {
 						index = game.level.getPlayerMPIndex(str[0]);
 					}
 					if(index != -1){
-						game.level.movePlayer(index,Integer.parseInt(str[1]),Integer.parseInt(str[2]),str[3].charAt(0),Integer.parseInt(str[4]));
+						game.level.movePlayer(index,Integer.parseInt(str[1]),Integer.parseInt(str[2]),str[3].charAt(0),Integer.parseInt(str[4]),Integer.parseInt(str[5]));
 					}
 				} catch (IOException e) {
 					System.out.println("Server died");
@@ -215,7 +256,19 @@ public class client {
 			while(true){
 				try {
 					String line = in.readLine();
-					chatBox.append("\n"+line);
+					line = line.trim();
+					if(line.startsWith("<")){
+						chatBox.append("\n"+line);
+					}else if(line.startsWith(name)){
+						String[] event = line.split("-_-");
+						int weap = Integer.parseInt(event[1]);
+						System.out.println(weap);
+						game.player.hp -= damage[weap-1];
+						if(game.player.hp<0){
+							game.player.hp = 0;
+						}
+						game.player.printHP();
+					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -256,22 +309,26 @@ public class client {
 			mess = "<"+name+">:  "+mess;
 			//chatBox.append(mess);
 			text.println(mess);
-			System.out.println("sent");
 		}else{
 			game.player.com = txt;
 			game.player.wasPressed = true;
 		}
 	}
 	
+	public void callDmg(String str){
+		text.println(str);
+	}
+	
 	public void callToSend(){
 		try {
 			/**	0: username; 1: x; 2: y; 3: direction; 4: hp	**/
-			String[] str = new String[5];
+			String[] str = new String[6];
 			str[0] = game.player.getUsername();
 			str[1] = String.valueOf(game.player.x);
 			str[2] = String.valueOf(game.player.y);
 			str[3] = String.valueOf(game.player.direction);
 			str[4] = String.valueOf(game.player.hp);
+			str[5] = String.valueOf(game.player.weapon);
 			
 			obj.writeObject(str);
 			System.out.println("Sent");

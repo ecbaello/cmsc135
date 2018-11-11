@@ -1,10 +1,12 @@
+import java.util.List;
+
 public class Player extends Mob {
 
     private int colour = Colours.get(-1, 111, 005, 441);
     private int scale = 1;
     protected boolean isSwimming = false;
     private int tickCount = 0;
-    private String username;
+    public String username;
     public String com;
     public boolean wasPressed = false;
     public char direction = 'w';
@@ -12,9 +14,10 @@ public class Player extends Mob {
     private int ya;
     public int hp = 100;
     public Game game;
+    public int weapon=1;	/* 1-pistol; 2-shotgun; 3-sniper */
 
     public Player(Level level, int x, int y, String username) {
-        super(level, "Player", x, y, 1);
+        super(level, username, x, y, 1);
         this.username = username;
     }
 
@@ -27,6 +30,9 @@ public class Player extends Mob {
         		case "back":	back(); break;
         		case "a":	rotL(); break;
         		case "d":	rotR(); break;
+        		case "q":	weaponQ(); break;
+        		case "e":	weaponE(); break;
+        		case "pew":	checkTarget(); break;
         		default:	System.out.println("Command Not Recognized");
         	}
         }
@@ -177,4 +183,94 @@ public class Player extends Mob {
 			default:	System.out.println("Problematic Situation");
     	}
     }
+    
+    private void weaponQ(){
+    	switch(weapon){
+			case 1:	weapon = 3; break;
+			case 2:	weapon = 1; break;
+			case 3:	weapon = 2; break;
+			default:	System.out.println("Problematic Situation");
+    	}
+    	printWeapon();
+    }
+    
+    private void weaponE(){
+    	switch(weapon){
+			case 1:	weapon = 2; break;
+			case 2:	weapon = 3; break;
+			case 3:	weapon = 1; break;
+			default:	System.out.println("Problematic Situation");
+    	}
+    	printWeapon();
+    }
+    
+    public void checkTarget(){
+    	List<Entity> ent = game.level.getEntities();
+    	
+    	for(Entity e:ent){
+    		switch(weapon){
+    			case 1: checkPistolRange(e);
+    		}
+    	}
+    }
+    
+    /** Display purposes **/
+    
+    public void printWeapon(){
+    	String gun = "";
+    	switch(weapon){
+    		case 1:	gun = "Pistol"; break;
+    		case 2:	gun = "Shotgun"; break;
+    		case 3: gun = "Sniper"; break;
+    		default: gun = "???"; break;
+    	}
+    	game.cc.gunField.setText(gun);
+    }
+    
+    public void printHP(){
+    	game.cc.hpField.setText(String.valueOf(hp));
+    }
+    
+    /** For Checking **/
+    
+    private void checkPistolRange(Entity ent){
+    	switch(direction){
+    		case 'w':
+    			if( ((y-8)>=0 && (y-8)==ent.y) || ((y-16)>=0 && (y-16)==ent.y) ){
+    				game.cc.callDmg(ent.username + "-_-" + "1");
+    			}
+    			break;
+    		case 'a':
+    			if( ((x-8)>=0 && (x-8)==ent.x) || ((x-16)>=0 && (x-16)==ent.x) ){
+    				game.cc.callDmg(ent.username + "-_-" + "1");
+    			}
+    			break;
+    		case 's':
+    			if( ((y+8)<=400 && (y+8)==ent.y) || ((y+16)<=400 && (y+16)==ent.y) ){
+    				game.cc.callDmg(ent.username + "-_-" + "1");
+    			}
+    			break;
+    		case 'd':
+    			if( ((x+8)<=400 && (x+8)==ent.x) || ((x+16)<=400 && (x+16)==ent.x) ){
+    				game.cc.callDmg(ent.username + "-_-" + "1");
+    			}
+    			break;
+    		default:	System.out.println("Bakit may ganyan");
+    	}
+    }
+    
+    private void checkShotgunRange(Entity ent){
+    	
+    }
+    
+    private void checkSniperRange(Entity ent){
+    	switch(direction){
+    		case 'w':
+    			
+    		case 'a':	
+    		case 's':	
+    		case 'd':	
+    	}
+    }
+    
 }
