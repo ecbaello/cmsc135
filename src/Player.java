@@ -271,22 +271,22 @@ public class Player extends Mob {
     private void checkPistolRange(Entity ent){
     	switch(direction){
     		case 'w':
-    			if( ((y-8)>=0 && (y-8)==ent.y) || ((y-16)>=0 && (y-16)==ent.y) ){
+    			if( x==ent.x && ( (y-8)==ent.y || (y-16)==ent.y ) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
     		case 'a':
-    			if( ((x-8)>=0 && (x-8)==ent.x) || ((x-16)>=0 && (x-16)==ent.x) ){
+    			if( y==ent.y && ( (x-8)==ent.x || (x-16)==ent.x ) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
     		case 's':
-    			if( ((y+8)<=400 && (y+8)==ent.y) || ((y+16)<=400 && (y+16)==ent.y) ){
+    			if( x==ent.x && ( (y+8)==ent.y || (y+16)==ent.y ) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
     		case 'd':
-    			if( ((x+8)<=400 && (x+8)==ent.x) || ((x+16)<=400 && (x+16)==ent.x) ){
+    			if( y==ent.y && ( (x+8)==ent.x || (x+16)==ent.x ) ){
     				game.cc.callDmg(ent.username + "-_-" + "1");
     			}
     			break;
@@ -295,16 +295,58 @@ public class Player extends Mob {
     }
     
     private void checkShotgunRange(Entity ent){
-    	
+    	switch(direction){
+	    	case 'w':
+				if( ( ( (y-16)==ent.y || (y-24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
+					game.cc.callDmg(ent.username + "-_-" + "2");
+				}
+				break;
+			case 'a':
+				if( ( ( (x-16)==ent.x || (x-24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
+					game.cc.callDmg(ent.username + "-_-" + "2");
+				}
+				break;
+			case 's':
+				if( ( ( (y+16)==ent.y || (y+24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
+					game.cc.callDmg(ent.username + "-_-" + "2");
+				}
+				break;
+			case 'd':
+				if( ( ( (x+16)==ent.x || (x+24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
+					game.cc.callDmg(ent.username + "-_-" + "2");
+				}
+				break;
+			default:	System.out.println("Bakit may ganyan");
+    	}
     }
     
     private void checkSniperRange(Entity ent){
     	switch(direction){
-    		case 'w':
-    			
-    		case 'a':	
-    		case 's':	
-    		case 'd':	
+			case 'w':
+				if(x!=ent.x) return;
+				if( (y-32)==ent.y || (y-40)==ent.y || (y-48)==ent.y ){
+					game.cc.callDmg(ent.username + "-_-" + "3");
+				}
+				break;
+			case 'a':
+				if(y!=ent.y) return;
+				if( (x-32)==ent.x || (x-40)==ent.x || (x-48)==ent.x ){
+					game.cc.callDmg(ent.username + "-_-" + "3");
+				}
+				break;
+			case 's':
+				if(x!=ent.x) return;
+				if( (y+32)==ent.y || (y+40)==ent.y || (y+48)==ent.y ){
+					game.cc.callDmg(ent.username + "-_-" + "3");
+				}
+				break;
+			case 'd':
+				if(y!=ent.y) return;
+				if( (x+32)==ent.x || (x+48)==ent.x || (x+48)==ent.x ){
+					game.cc.callDmg(ent.username + "-_-" + "3");
+				}
+				break;
+			default:	System.out.println("Bakit may ganyan");
     	}
     }
     
