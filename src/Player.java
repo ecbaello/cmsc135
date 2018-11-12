@@ -141,8 +141,7 @@ public class Player extends Mob {
                     * 32, Colours.get(-1, 000, 000, 000), flipBottom, scale);
         }
         if (username != null) {
-        	String disp = username+" "+String.valueOf(hp/100);
-            Font.render(disp, screen, xOffset - ((disp.length() - 1) / 2 * 8), yOffset - 10,
+            Font.render(username, screen, xOffset - ((username.length() - 1) / 2 * 8), yOffset - 10,
                     Colours.get(-1, -1, -1, 555), 1);
         }
     }
@@ -153,22 +152,22 @@ public class Player extends Mob {
         int yMin = 3;
         int yMax = 7;
         for (int x = xMin; x < xMax; x++) {
-            if (isSolidTile(xa, ya-8, x, yMin-8)) {
+            if (isSolidTile(xa, ya, x, yMin)) {
                 return true;
             }
         }
         for (int x = xMin; x < xMax; x++) {
-            if (isSolidTile(xa, ya-8, x, yMax-8)) {
+            if (isSolidTile(xa, ya, x, yMax)) {
                 return true;
             }
         }
         for (int y = yMin; y < yMax; y++) {
-            if (isSolidTile(xa, ya-8, xMin, y-8)) {
+            if (isSolidTile(xa, ya, xMin, y)) {
                 return true;
             }
         }
         for (int y = yMin; y < yMax; y++) {
-            if (isSolidTile(xa, ya, xMax, y-8)) {
+            if (isSolidTile(xa, ya, xMax, y)) {
                 return true;
             }
         }

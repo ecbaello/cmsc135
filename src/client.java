@@ -167,7 +167,7 @@ public class client {
 		chatBox.setEditable(false);
 		chatBox.setColumns(20);
 		scrollPane.setViewportView(chatBox);
-		chatBox.setText("Chat Box");
+		chatBox.setText("Chat Box\n Movements:\n w - forward a - rotate left\n d - rotate right back - retreat\n q or e - change weapon pew - fire\n /c - chat");
 		
 		game.start(this);
 	}
