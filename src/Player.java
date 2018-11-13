@@ -129,6 +129,10 @@ public class Player extends Mob {
 	                    flipBottom, scale);
 	            screen.render(xOffset + modifier - (modifier * flipBottom), yOffset + modifier, (xTile + 1) + (yTile + 1)
 	                    * 32, Colours.get(-1, 400, 444, 332), flipBottom, scale);
+	            printHP();
+	            if(isDead){
+	            	game.cc.callToSend();
+	            }
 	        }
 	        
     	}else {
@@ -264,7 +268,7 @@ public class Player extends Mob {
     }
     
     public void printHP(){
-    	game.cc.hpField.setText(String.valueOf(hp/100));
+    	game.cc.hpField.setText(String.valueOf((double)hp/100));
     }
     
     /** For Checking **/
