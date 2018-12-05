@@ -186,19 +186,19 @@ public class Player extends Mob {
     
     private void rotL(){
     	switch(direction){
-			case 'w': direction='a'; break;
-			case 'a': direction='s'; break;
-			case 's': direction='d'; break;
-			default: direction='w';
+			case 'w': direction='a'; movingDir = 2; break;
+			case 'a': direction='s'; movingDir = 1; break;
+			case 's': direction='d'; movingDir = 3; break;
+			default: direction='w'; movingDir = 0;
     	}
     }
     
     private void rotR(){
 		switch(direction){
-			case 'w': direction='d'; break;
-			case 'a': direction='w'; break;
-			case 's': direction='a'; break;
-			default: direction='s';
+			case 'w': direction='d'; movingDir = 3; break;
+			case 'a': direction='w'; movingDir = 0; break;
+			case 's': direction='a'; movingDir = 2; break;
+			default: direction='s'; movingDir = 1;
 		}
 	}
     

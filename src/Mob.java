@@ -24,14 +24,14 @@ public abstract class Mob extends Entity {
         }
         numSteps++;
         if (!hasCollided(xa, ya)) {
-            if (ya < 0)
+            /*if (ya < 0)
                 movingDir = 0;
             if (ya > 0)
                 movingDir = 1;
             if (xa < 0)
                 movingDir = 2;
             if (xa > 0)
-                movingDir = 3;
+                movingDir = 3;*/
             x += xa * speed;
             y += ya * speed;
         }
