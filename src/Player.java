@@ -357,12 +357,12 @@ public class Player extends Mob {
                 Tile holdT4 = level.getTile((x - 8) / 8, (y - 24) / 8);
                 Tile holdT5 = level.getTile((x + 8) / 8, (y - 16) / 8);
                 Tile holdT6 = level.getTile((x + 8) / 8, (y - 24) / 8);
-                game.level.alterTile(x / 8, (y - 16) / 8, tile.BOOM);
-                game.level.alterTile(x / 8, (y - 24) / 8, tile.BOOM);
-                game.level.alterTile((x - 8) / 8, (y - 16) / 8, tile.BOOM);
-                game.level.alterTile((x - 8) / 8, (y - 24) / 8, tile.BOOM);
-                game.level.alterTile((x + 8) / 8, (y - 16) / 8, tile.BOOM);
-                game.level.alterTile((x + 8) / 8, (y - 24) / 8, tile.BOOM);
+                game.level.alterTile(x / 8, (y - 16) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y - 24) / 8, Tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y - 16) / 8, Tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y - 24) / 8, Tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y - 16) / 8, Tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y - 24) / 8, Tile.BOOM);
 				break;
 			case 'a':
 				if( ( ( (x-16)==ent.x || (x-24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
@@ -374,12 +374,12 @@ public class Player extends Mob {
                 holdT4 = level.getTile((x - 24) / 8, (y - 8) / 8);
                 holdT5 = level.getTile((x - 16) / 8, (y + 8) / 8);
                 holdT6 = level.getTile((x - 24) / 8, (y + 8) / 8);
-                game.level.alterTile((x - 16) / 8, y / 8, tile.BOOM);
-                game.level.alterTile((x - 24) / 8, y / 8, tile.BOOM);
-                game.level.alterTile((x - 16) / 8, (y - 8) / 8, tile.BOOM);
-                game.level.alterTile((x - 24) / 8, (y - 8) / 8, tile.BOOM);
-                game.level.alterTile((x - 16) / 8, (y + 8) / 8, tile.BOOM);
-                game.level.alterTile((x - 24) / 8, (y + 8) / 8, tile.BOOM);
+                game.level.alterTile((x - 16) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x - 24) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x - 16) / 8, (y - 8)/ 8, Tile.BOOM);
+                game.level.alterTile((x - 24) / 8, (y - 8) / 8,Tile.BOOM);
+                game.level.alterTile((x - 16) / 8, (y + 8) / 8, Tile.BOOM);
+                game.level.alterTile((x - 24) / 8, (y + 8) / 8, Tile.BOOM);
 				break;
 			case 's':
 				if( ( ( (y+16)==ent.y || (y+24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
@@ -391,12 +391,12 @@ public class Player extends Mob {
                 holdT4 = level.getTile((x - 8) / 8, (y + 24) / 8);
                 holdT5 = level.getTile((x + 8) / 8, (y + 16) / 8);
                 holdT6 = level.getTile((x + 8) / 8, (y + 24) / 8);
-                game.level.alterTile(x / 8, (y + 16) / 8, tile.BOOM);
-                game.level.alterTile(x / 8, (y + 24) / 8, tile.BOOM);
-                game.level.alterTile((x - 8) / 8, (y + 16) / 8, tile.BOOM);
-                game.level.alterTile((x - 8) / 8, (y + 24) / 8, tile.BOOM);
-                game.level.alterTile((x + 8) / 8, (y + 16) / 8, tile.BOOM);
-                game.level.alterTile((x + 8) / 8, (y + 24) / 8, tile.BOOM);
+                game.level.alterTile(x / 8, (y + 16) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y + 24) / 8, Tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y + 16) / 8, Tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y + 24) / 8, Tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y + 16) / 8, Tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y + 24) / 8, Tile.BOOM);
 				break;
 			case 'd':
 				if( ( ( (x+16)==ent.x || (x+24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
@@ -408,12 +408,12 @@ public class Player extends Mob {
                 holdT4 = level.getTile((x + 24) / 8, (y - 8) / 8);
                 holdT5 = level.getTile((x + 16) / 8, (y + 8) / 8);
                 holdT6 = level.getTile((x + 24) / 8, (y + 8) / 8);
-                game.level.alterTile((x + 16) / 8, y / 8, tile.BOOM);
-                game.level.alterTile((x + 24) / 8, y / 8, tile.BOOM);
-                game.level.alterTile((x + 16) / 8, (y - 8) / 8, tile.BOOM);
-                game.level.alterTile((x + 24) / 8, (y - 8) / 8, tile.BOOM);
-                game.level.alterTile((x + 16) / 8, (y + 8) / 8, tile.BOOM);
-                game.level.alterTile((x + 24) / 8, (y + 8) / 8, tile.BOOM);
+                game.level.alterTile((x + 16) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x + 24) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x + 16) / 8, (y - 8) / 8, Tile.BOOM);
+                game.level.alterTile((x + 24) / 8, (y - 8) / 8, Tile.BOOM);
+                game.level.alterTile((x + 16) / 8, (y + 8) / 8, Tile.BOOM);
+                game.level.alterTile((x + 24) / 8, (y + 8) / 8, Tile.BOOM);
 				break;
 			default:	System.out.println("Bakit may ganyan");
     	}

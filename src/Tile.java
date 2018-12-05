@@ -10,6 +10,7 @@ public abstract class Tile {
     public static final Tile ROADLINES = new BasicTile(6, 1, 0, Colours.get(-1, 540, -1, -1), 0xFFFFFC00);
     public static final Tile WALL = new  BasicSolidTile(7, 1, 0, Colours.get(-1, 333, -1, -1), 0xFF333333);
     public static final Tile MUD = new BasicTile(8, 2, 0, Colours.get(-1, 421, 444, -1), 0xFF722E01);
+    public static final Tile BOOM = new BasicTile(9, 1, 0, Colours.get(-1, 555, -1, -1), 0xFF00FF00);
     protected byte id;
     protected boolean solid;
     protected boolean emitter;
