@@ -1,8 +1,9 @@
 import java.util.List;
+import java.util.Random;
 
 public class Player extends Mob {
 
-    private int colour = Colours.get(-1, 500, 555, 443);
+    private int colour;
     private int scale = 1;
     protected boolean isSwimming = false;
     protected boolean isBurning = false;
@@ -21,6 +22,11 @@ public class Player extends Mob {
     public Player(Level level, int x, int y, String username) {
         super(level, username, x, y, 1);
         this.username = username;
+        Random r = new Random();
+        int i = r.nextInt(5) * 100;
+        int j = r.nextInt(5) * 10;
+        int k = r.nextInt(5);
+        colour = Colours.get(-1, i + j + k, 555, 000);
     }
 
     public void tick() {
@@ -276,25 +282,65 @@ public class Player extends Mob {
     private void checkPistolRange(Entity ent){
     	switch(direction){
     		case 'w':
-    			if( x==ent.x && ( (y-8)==ent.y || (y-16)==ent.y ) ){
-    				game.cc.callDmg(ent.username + "-_-" + "1");
-    			}
-    			break;
-    		case 'a':
-    			if( y==ent.y && ( (x-8)==ent.x || (x-16)==ent.x ) ){
-    				game.cc.callDmg(ent.username + "-_-" + "1");
-    			}
-    			break;
-    		case 's':
-    			if( x==ent.x && ( (y+8)==ent.y || (y+16)==ent.y ) ){
-    				game.cc.callDmg(ent.username + "-_-" + "1");
-    			}
-    			break;
-    		case 'd':
-    			if( y==ent.y && ( (x+8)==ent.x || (x+16)==ent.x ) ){
-    				game.cc.callDmg(ent.username + "-_-" + "1");
-    			}
-    			break;
+                if( x==ent.x && ( (y-8)==ent.y || (y-16)==ent.y ) ){
+                    game.cc.callDmg(ent.username + "-_-" + "1");
+                }
+                long t = System.currentTimeMillis();
+                System.out.println(x+" "+y);
+                Tile holdT1 = level.getTile(x / 8, (y - 8) / 8);
+                Tile holdT2 = level.getTile(x / 8, (y - 16) / 8);
+                game.level.alterTile(x / 8, (y - 8) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y - 16) / 8, Tile.BOOM);
+                if(System.currentTimeMillis() - t >= 2) {
+                    game.level.alterTile(x / 8, (y - 8) / 8, holdT1);
+                    game.level.alterTile(x / 8, (y - 16) / 8, holdT2);
+                }
+                break;
+            case 'a':
+                if( y==ent.y && ( (x-8)==ent.x || (x-16)==ent.x ) ){
+                    game.cc.callDmg(ent.username + "-_-" + "1");            
+                }
+                t = System.currentTimeMillis();
+                System.out.println(x+" "+y);
+                holdT1 = level.getTile((x - 8) / 8, y / 8);
+                holdT2 = level.getTile((x - 16) / 8, y / 8);
+                game.level.alterTile((x - 8) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x - 16) / 8, y / 8, Tile.BOOM);
+                if(System.currentTimeMillis() - t >= 2) {
+                    game.level.alterTile((x - 8) / 8, y / 8, holdT1);
+                    game.level.alterTile((x - 16) / 8, y / 8, holdT2);
+                }
+                break;
+            case 's':
+                if( x==ent.x && ( (y+8)==ent.y || (y+16)==ent.y ) ){
+                    game.cc.callDmg(ent.username + "-_-" + "1");
+                }
+                t = System.currentTimeMillis();
+                System.out.println(x+" "+y);
+                holdT1 = level.getTile(x / 8, (y + 8) / 8);
+                holdT2 = level.getTile(x / 8, (y + 16) / 8);
+                game.level.alterTile(x / 8, (y + 8) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y + 16) / 8, Tile.BOOM);
+                if(System.currentTimeMillis() - t >= 2) {
+                    game.level.alterTile(x / 8, (y + 8) / 8, holdT1);
+                    game.level.alterTile(x / 8, (y + 16) / 8, holdT2);
+                }
+                break;
+            case 'd':
+                if( y==ent.y && ( (x+8)==ent.x || (x+16)==ent.x ) ){
+                    game.cc.callDmg(ent.username + "-_-" + "1");
+                }
+                t = System.currentTimeMillis();
+                System.out.println(x+" "+y);
+                holdT1 = level.getTile((x + 8) / 8, y / 8);
+                holdT2 = level.getTile((x + 16) / 8, y / 8);
+                game.level.alterTile((x + 8) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x + 16) / 8, y / 8, Tile.BOOM);
+                if(System.currentTimeMillis() - t >= 2) {
+                    game.level.alterTile((x + 8) / 8, y / 8, holdT1);
+                    game.level.alterTile((x + 16) / 8, y / 8, holdT2);
+                }
+                break;
     		default:	System.out.println("Bakit may ganyan");
     	}
     }
@@ -305,21 +351,69 @@ public class Player extends Mob {
 				if( ( ( (y-16)==ent.y || (y-24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
 					game.cc.callDmg(ent.username + "-_-" + "2");
 				}
+                Tile holdT1 = level.getTile(x / 8, (y - 16) / 8);
+                Tile holdT2 = level.getTile(x / 8, (y - 24) / 8);
+                Tile holdT3 = level.getTile((x - 8) / 8, (y - 16) / 8);
+                Tile holdT4 = level.getTile((x - 8) / 8, (y - 24) / 8);
+                Tile holdT5 = level.getTile((x + 8) / 8, (y - 16) / 8);
+                Tile holdT6 = level.getTile((x + 8) / 8, (y - 24) / 8);
+                game.level.alterTile(x / 8, (y - 16) / 8, tile.BOOM);
+                game.level.alterTile(x / 8, (y - 24) / 8, tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y - 16) / 8, tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y - 24) / 8, tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y - 16) / 8, tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y - 24) / 8, tile.BOOM);
 				break;
 			case 'a':
 				if( ( ( (x-16)==ent.x || (x-24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
 					game.cc.callDmg(ent.username + "-_-" + "2");
 				}
+                holdT1 = level.getTile((x - 16) / 8, y / 8);
+                holdT2 = level.getTile((x - 24) / 8, y / 8);
+                holdT3 = level.getTile((x - 16) / 8, (y - 8) / 8);
+                holdT4 = level.getTile((x - 24) / 8, (y - 8) / 8);
+                holdT5 = level.getTile((x - 16) / 8, (y + 8) / 8);
+                holdT6 = level.getTile((x - 24) / 8, (y + 8) / 8);
+                game.level.alterTile((x - 16) / 8, y / 8, tile.BOOM);
+                game.level.alterTile((x - 24) / 8, y / 8, tile.BOOM);
+                game.level.alterTile((x - 16) / 8, (y - 8) / 8, tile.BOOM);
+                game.level.alterTile((x - 24) / 8, (y - 8) / 8, tile.BOOM);
+                game.level.alterTile((x - 16) / 8, (y + 8) / 8, tile.BOOM);
+                game.level.alterTile((x - 24) / 8, (y + 8) / 8, tile.BOOM);
 				break;
 			case 's':
 				if( ( ( (y+16)==ent.y || (y+24)==ent.y ) && ( x==ent.x || (x-8)==ent.x || (x+8)==ent.x ) ) ){
 					game.cc.callDmg(ent.username + "-_-" + "2");
 				}
+                holdT1 = level.getTile(x / 8, (y + 16) / 8);
+                holdT2 = level.getTile(x / 8, (y + 24) / 8);
+                holdT3 = level.getTile((x - 8) / 8, (y + 16) / 8);
+                holdT4 = level.getTile((x - 8) / 8, (y + 24) / 8);
+                holdT5 = level.getTile((x + 8) / 8, (y + 16) / 8);
+                holdT6 = level.getTile((x + 8) / 8, (y + 24) / 8);
+                game.level.alterTile(x / 8, (y + 16) / 8, tile.BOOM);
+                game.level.alterTile(x / 8, (y + 24) / 8, tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y + 16) / 8, tile.BOOM);
+                game.level.alterTile((x - 8) / 8, (y + 24) / 8, tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y + 16) / 8, tile.BOOM);
+                game.level.alterTile((x + 8) / 8, (y + 24) / 8, tile.BOOM);
 				break;
 			case 'd':
 				if( ( ( (x+16)==ent.x || (x+24)==ent.x ) && ( y==ent.y || (y-8)==ent.y || (y+8)==ent.y ) ) ){
 					game.cc.callDmg(ent.username + "-_-" + "2");
 				}
+                holdT1 = level.getTile((x + 16) / 8, y / 8);
+                holdT2 = level.getTile((x + 24) / 8, y / 8);
+                holdT3 = level.getTile((x + 16) / 8, (y - 8) / 8);
+                holdT4 = level.getTile((x + 24) / 8, (y - 8) / 8);
+                holdT5 = level.getTile((x + 16) / 8, (y + 8) / 8);
+                holdT6 = level.getTile((x + 24) / 8, (y + 8) / 8);
+                game.level.alterTile((x + 16) / 8, y / 8, tile.BOOM);
+                game.level.alterTile((x + 24) / 8, y / 8, tile.BOOM);
+                game.level.alterTile((x + 16) / 8, (y - 8) / 8, tile.BOOM);
+                game.level.alterTile((x + 24) / 8, (y - 8) / 8, tile.BOOM);
+                game.level.alterTile((x + 16) / 8, (y + 8) / 8, tile.BOOM);
+                game.level.alterTile((x + 24) / 8, (y + 8) / 8, tile.BOOM);
 				break;
 			default:	System.out.println("Bakit may ganyan");
     	}
@@ -332,24 +426,48 @@ public class Player extends Mob {
 				if( (y-32)==ent.y || (y-40)==ent.y || (y-48)==ent.y ){
 					game.cc.callDmg(ent.username + "-_-" + "3");
 				}
+                Tile holdT1 = level.getTile(x / 8, (y - 32) / 8);
+                Tile holdT2 = level.getTile(x / 8, (y - 40) / 8);
+                Tile holdT3 = level.getTile(x / 8, (y - 48) / 8);
+                game.level.alterTile(x / 8, (y - 32) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y - 40) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y - 48) / 8, Tile.BOOM);
 				break;
 			case 'a':
 				if(y!=ent.y) return;
 				if( (x-32)==ent.x || (x-40)==ent.x || (x-48)==ent.x ){
 					game.cc.callDmg(ent.username + "-_-" + "3");
 				}
+                holdT1 = level.getTile((x - 32) / 8, y / 8);
+                holdT2 = level.getTile((x - 40) / 8, y / 8);
+                holdT3 = level.getTile((x - 42) / 8, y / 8);
+                game.level.alterTile((x - 32) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x - 40) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x - 42) / 8, y / 8, Tile.BOOM);
 				break;
 			case 's':
 				if(x!=ent.x) return;
 				if( (y+32)==ent.y || (y+40)==ent.y || (y+48)==ent.y ){
 					game.cc.callDmg(ent.username + "-_-" + "3");
 				}
+                holdT1 = level.getTile(x / 8, (y + 32) / 8);
+                holdT2 = level.getTile(x / 8, (y + 40) / 8);
+                holdT3 = level.getTile(x / 8, (y + 48) / 8);
+                game.level.alterTile(x / 8, (y + 32) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y + 40) / 8, Tile.BOOM);
+                game.level.alterTile(x / 8, (y + 48) / 8, Tile.BOOM);
 				break;
 			case 'd':
 				if(y!=ent.y) return;
 				if( (x+32)==ent.x || (x+48)==ent.x || (x+48)==ent.x ){
 					game.cc.callDmg(ent.username + "-_-" + "3");
 				}
+                holdT1 = level.getTile((x + 32) / 8, y / 8);
+                holdT2 = level.getTile((x + 40) / 8, y / 8);
+                holdT3 = level.getTile((x + 42) / 8, y / 8);
+                game.level.alterTile((x + 32) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x + 40) / 8, y / 8, Tile.BOOM);
+                game.level.alterTile((x + 42) / 8, y / 8, Tile.BOOM);
 				break;
 			default:	System.out.println("Bakit may ganyan");
     	}
