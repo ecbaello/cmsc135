@@ -31,7 +31,7 @@ public class client {
 	private JButton btn;
 	private Game game;
 	public String name;
-    private List<PlayerMP> players = new ArrayList<PlayerMP>();
+	private List<PlayerMP> players = new ArrayList<PlayerMP>();
 	
 	private String host = "7NVd";
 	private int openS = 1234;
@@ -156,8 +156,8 @@ public class client {
 			}
 		});
 		game.setMinimumSize(Game.DIMENSIONS);
-        game.setMaximumSize(Game.DIMENSIONS);
-        game.setPreferredSize(Game.DIMENSIONS);
+        	game.setMaximumSize(Game.DIMENSIONS);
+        	game.setPreferredSize(Game.DIMENSIONS);
 		frame.getContentPane().add(game, BorderLayout.CENTER);
 		
 		scrollPane = new JScrollPane();
@@ -322,7 +322,7 @@ public class client {
 	
 	public void callToSend(){
 		try {
-			/**	0: username; 1: x; 2: y; 3: direction; 4: hp	**/
+			/**	0: username; 1: x; 2: y; 3: direction; 4: hp; 5: weapon	**/
 			String[] str = new String[6];
 			str[0] = game.player.getUsername();
 			str[1] = String.valueOf(game.player.x);
